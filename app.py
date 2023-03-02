@@ -20,7 +20,10 @@ def index():
         if "history" not in session:
             session["history"] = []
 
-        session["history"].append(response.choices[0].text)
+        session["history"].append({
+            "message": message,
+            "response": response.choices[0].text,
+        })
 
         return redirect(url_for("index"))
     
