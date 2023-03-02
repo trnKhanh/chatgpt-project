@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, url_for, render_template
+from flask import Flask, request, redirect, url_for, render_template, session
 import openai
 import os
 
@@ -16,9 +16,15 @@ def index():
             max_tokens=20,
             temperature=0.6,
         )
-        return redirect(url_for("index", response=response.choices[0].text))
+
+        if "history" not in session:
+            session["history"] = []
+
+        session["history"].append(response.choices[0].text)
+
+        return redirect(url_for("index"))
     
-    return render_template("index.html", response=response)
+    return render_template("index.html", history=session["history"])
 
 
 # create prompt function
