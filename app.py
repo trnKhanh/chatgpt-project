@@ -27,11 +27,14 @@ def index():
             "response": response.choices[0].text,
         })
 
-        return redirect(url_for("index"))
+        return redirect(url_for("index", h=1))
     
+    if not request.args.get("h"):
+        history.clear()
+
     return render_template("index.html", history=history)
 
 
 # create prompt function
 def create_prompt(p):
-    return p
+    return f'You are the chatbot. User: Hello\nChatbot: Hello. How are you?\nUser: {p}\nChatbot:'
