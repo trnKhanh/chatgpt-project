@@ -7,17 +7,11 @@
     </head>
 
     <body>
-        <form action="/" method="post">
-            <input type="text" autocomplete="off" autofocus placeholder="Let's chat" name="message">
-            <input type="submit" value="Send message">
+        <ul id="message-box"></ul>
+        <form>
+            <input id="input-box"autocomplete="off" autofocus placeholder="Let's chat">
+            <input id="send-button" type="submit" value="Send">
         </form>
-        {% if history %}
-            <ul>
-            {% for conversation in history  %}
-                <li>You: {{ conversation["message"] }}</li>
-                <li>Chatbot: {{ conversation["response"] }}</li>
-            {% endfor %}
-            </ul>
-        {% endif %}
+        <script src="../static/script.js"></script>
     </body>
 </html>
