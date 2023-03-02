@@ -7,8 +7,14 @@
 
     <body>
         <form action="/" method="post">
-            <input type="text" autocomplete="off" autofocus placeholder="Let's chat" name="p">
+            <input type="text" autocomplete="off" autofocus placeholder="Let's chat" name="message">
             <input type="submit" value="Send message">
         </form>
+        <ul>
+        {% for conversation in history  %}
+            <li>{{ conversation["message"] }}</li>
+            <li>{{ conversation["response"] }}</li>
+        {% endfor %}
+        </ul>
     </body>
 </html>
