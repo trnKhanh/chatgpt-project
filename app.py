@@ -20,7 +20,7 @@ def completion():
     response = openai.Completion.create(
         model="text-davinci-003",
         prompt=create_prompt(message),
-        max_tokens=20,
+        max_tokens=100,
         temperature=0.6,
     )
     return json.dumps(response.choices[0].text)

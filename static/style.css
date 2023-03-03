@@ -1,3 +1,14 @@
 ul {
     list-style-type: none;
 }
+#chatbox {
+    display: flex;
+}
+#message-box {
+    flex-grow: 5;
+}
+
+form {
+    flex-grow: 1;
+    background-color: lightblue;
+}

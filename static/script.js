@@ -7,6 +7,8 @@ form.addEventListener("submit",async (e) => {
 
     const message = inputBox.value;
 
+    messageBox.innerHTML += `<li>User: ${message}</li>`;
+
     const response = await fetch("/completion", {
         method: "POST",
         headers: {
