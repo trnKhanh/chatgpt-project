@@ -22,9 +22,6 @@ footer {
 }
 
 /* header */
-header {
-
-}
 .site-name {
     display: flex;
     flex-direction: row;
@@ -64,7 +61,6 @@ main {
 .message-box {
     flex: 1;
     font-size: 24px;
-    padding: 25px;
     overflow: scroll;
 }
 .chat-form {
@@ -86,4 +82,12 @@ main {
 }
 .send-btn {
     font-size: 18px;
+}
+
+.user-message {
+    padding: 5px 25px;
+    background-color: rgb(203, 206, 209);
+}
+.chatbot-message {
+    padding: 5px 25px ;
 }
