@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="chat-box">
+    <div class="message-box">
+        
+    </div>
+    <form class="chat-form">
+        <input class="input-box" autocomplete="off" required autofocus placeholder="Let's chat">
+        <select class="form-select" required>
+            <option selected disabled value="">Choose chatbot personality</option>
+            <option value="quiet">Quiet</option>
+            <option value="polite">Polite</option>
+            <option value="overconfident">Overconfident</option>
+            <!-- ... -->
+        </select>
+        <input class="send-btn" type="submit" value="Send">
+    </form>
+</div>
+{% endblock %}
