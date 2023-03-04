@@ -1,14 +1,89 @@
-ul {
-    list-style-type: none;
+* {
+    box-sizing: border-box;
 }
-#chatbox {
+html, body {
+    height: 100%;
+}
+body {
+    margin: 0;
+    font-size: 24px;
     display: flex;
-}
-#message-box {
-    flex-grow: 5;
+    flex-direction: column;
+    overflow: hidden;
 }
 
-form {
+/* footer */
+footer {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    text-align: center;
+    background-color: black;
+    color: white;
+}
+
+/* header */
+header {
+
+}
+.site-name {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.logo {
+    width: 200px;
+}
+.site-name > .name {
+    font-size: 50px;
+}
+.nav-bar {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    background-color: rgb(41, 40, 40);
+}
+.nav-btn {
+    border-radius: 15px;
+    margin: 5px;
+    padding: 7px;
+    color: white;
+}
+
+/* main */
+main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+.chat-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.message-box {
+    flex: 1;
+    font-size: 24px;
+    padding: 25px;
+    overflow: scroll;
+}
+.chat-form {
+    padding: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+.input-box {
+    padding: 10px;
+    color: white;
+    background-color: black;
+    font-size: 24px;
     flex-grow: 1;
-    background-color: lightblue;
+    border: none;
+}
+.form-select {
+    font-size: 18px;
+}
+.send-btn {
+    font-size: 18px;
 }
