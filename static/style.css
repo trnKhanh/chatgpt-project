@@ -91,3 +91,23 @@ main {
 .chatbot-message {
     padding: 5px 25px ;
 }
+
+.mic-btn {
+    text-align: center;
+    height: 50px;
+    width: 50px;
+}
+.mic-btn > img {
+    height: 30px;
+    width: 30px;
+}
+.speak-btn > img {
+    height: 30px;
+    width: 30px;
+}
+.on-btn {
+    background-color: greenyellow;
+}
+.off-btn {
+    background-color: red;
+}

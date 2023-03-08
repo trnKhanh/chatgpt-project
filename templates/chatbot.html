@@ -8,12 +8,15 @@
     <form class="chat-form">
         <input class="input-box" autocomplete="off" required autofocus placeholder="Let's chat">
         <select class="form-select" required>
-            <option selected disabled value="">Choose chatbot personality</option>
-            <option value="normal">Normal</option>
-            <option value="weather">Weather</option>
+            <option selected disabled value="">Choose chatbot</option>
+            <option value="normal">Normal bot</option>
+            <option value="weather">Weather bot</option>
             <!-- ... -->
         </select>
+        <button class="off-btn mic-btn" type="button"><img src="../static/mic.png"></button>
+        <button class="off-btn speak-btn" type="button"><img src="../static/speaker.png"></button>
         <input class="send-btn" type="submit" value="Send">
     </form>
 </div>
+<script src="../static/chatbot.js"></script>
 {% endblock %}

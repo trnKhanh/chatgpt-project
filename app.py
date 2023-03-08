@@ -3,8 +3,12 @@ import openai
 import os
 import json
 import requests
-import pycountry
+from mimetypes import guess_extension
+from pydub import AudioSegment
 
+
+
+max_tokens = 100
 openai.api_key = os.getenv("OPENAI_API_KEY")
 OPEN_WEATHER_API_KEY = os.getenv("OPEN_WEATHER_API_KEY")
 
@@ -18,49 +22,114 @@ def index():
 def chatbot():
     return render_template("chatbot.html")
 
-@app.route("/completion", methods=["POST"])
-def completion():
+@app.route("/response", methods=["POST"])
+def response():
     message = request.json["message"]
     type = request.json["type"]
     # create response
     return json.dumps(response_function[type](message))
 
-# ask using create_prompt function
-def ask(prompt):
+@app.route("/whisper", methods=["POST"])
+def whisper():
+    file = request.files["audio_file"]
+    file.save("audio_file.webm")
+    audio = AudioSegment.from_file("audio_file.webm", format="webm")
+    audio.export("audio_file.mp3", format="mp3")
+
+    with open("audio_file.mp3", "rb") as audio_file:
+        transcript = openai.Audio.transcribe("whisper-1", audio_file)
+
+    os.remove("audio_file.webm")
+    os.remove("audio_file.mp3")
+    return json.dumps(transcript["text"])
+
+# ask using completion model
+def ask_completion(prompt):
     response = openai.Completion.create(
         model="text-davinci-003",
         prompt=prompt,
-        max_tokens=100,
+        max_tokens=max_tokens,
         temperature=0.6,
     )
     return response.choices[0].text
 
+# ask using chat model
+def ask_chat(messages):
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=messages,
+        max_tokens=max_tokens,
+        temperature=0.6,
+    )
+    return response["choices"][0]["message"]["content"]
+
+# prompt used for completion model
 def normal_prompt(p):
     return f'You are a chatbot. You should response politely.\nUser: Hello\nChatbot: Hello, sir.\nUser: Who are you?\nChatbot: I am a chatbot\nUser: {p}\nChatbot:'
+
 def extract_name_prompt(p):
     return f'Extract name from the sentence.\nSentence: I want to know the weather in India.\nName: India.\nSentence: What is the weather like in Vietnam.\nName: Vietnam.\nSentence: {p}\nName:'
+
 def weather_prompt(main, min_temp, max_temp, humidity):
     return f'Write a  weather description based on given information.\n\nWeather: rain.\nTemperature: 15 to 20 (Celsius Degree).\nHumidity: 80.\nDescription: The weather is rainy with temperature ranging from 15 to 20 Celsius Degree. The humidity is around 80%. Remember to bring umbrella when going out.\n\nWeather: sunny.\nTemperature: 30 to 40 (Celsius Degree).\nHumidity: 50.\nDescription:  The weather is sunny with temperature ranging from 30 to 40 Celsius Degree. The humidity is around 50%, making it a very hot day day. Remember to use sun cream before going out.\n\nWeather: {main}.\nTemperature: {min_temp} to {max_temp}(Celsius Degree).\nHumidity: {humidity}.\nDescription: '
 
-def normal_response(message):
-    return ask(normal_prompt(message))
+# messages used for chat model
+normal_chatbot_messages = [
+    {"role": "system", "content": "You are a helpful assistant."},
+]
+extract_name_messages = [
+    {"role": "system", "content": "You will response with the location name from user message. Response with the name only."},
+    {"role": "user", "content":""},
+]
+weather_description_messages = [
+    {"role": "system", "content": "Write a weather description based on given information."},
+    {"role": "user", "content": "Weather: rain. Temperature: 15 to 20 (Celsius Degree). Humidity: 80."},
+    {"role": "assistant", "content": "The weather is rainy with temperature ranging from 15 to 20 Celsius Degree. The humidity is around 80%. Remember to bring umbrella when going out."},
+    {"role": "user", "content":""},
+]
+
+# response functions
+# normal chatbot
+def normal_chatbot_response(message):
+    normal_chatbot_messages.append(
+        {"role": "user", "content": message}
+    )
+    result = ask_chat(normal_chatbot_messages)
+    normal_chatbot_messages.append(
+        {"role": "assistant", "content": result}
+    )
+    return result
+
+# weather bot
+def extract_name(message):
+    extract_name_messages[-1]["content"] = message
+    name = ask_chat(extract_name_messages)
+    return name
+
+def get_weather_description(main, temp_min, temp_max, humidity):
+    weather_description_messages[-1]["content"] = f'Weather: {main}. Temperature: {temp_min} to {temp_max} (Celsius Degree). Humidity: {humidity}.'
+    weather_description = ask_chat(weather_description_messages)
+    return weather_description
+
 def weather_resonse(message):
-    city_name = ask(extract_name_prompt(message)).strip(".").strip()
+    location_name = extract_name(message)
+    try:
+        coordinate = requests.get(f'http://api.openweathermap.org/geo/1.0/direct?q={location_name}&limit=1&appid={OPEN_WEATHER_API_KEY}').json()
+        lat = coordinate[0]["lat"]
+        lon = coordinate[0]["lon"]
 
-    coordinate = requests.get(f'http://api.openweathermap.org/geo/1.0/direct?q={city_name}&limit=1&appid={OPEN_WEATHER_API_KEY}').json()
-    lat = coordinate[0]["lat"]
-    lon = coordinate[0]["lon"]
+        weather = requests.get(f'https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={OPEN_WEATHER_API_KEY}&units=metric').json()
+        main = weather["weather"][0]["main"]
+        temp_min = weather["main"]["temp_min"]
+        temp_max = weather["main"]["temp_max"]
+        humidity = weather["main"]["humidity"]
+    except:
+        return "I do not understand what you've said."
 
-    weather = requests.get(f'https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={OPEN_WEATHER_API_KEY}&units=metric').json()
-    print(lat)
-    print(lon)
-    main = weather["weather"][0]["main"]
-    min_temp = weather["main"]["temp_min"]
-    max_temp = weather["main"]["temp_max"]
-    humidity = weather["main"]["humidity"]
-    return ask(weather_prompt(main, min_temp, max_temp, humidity))
+    return get_weather_description(main, temp_min, temp_max, humidity)
 
+# dictionary for response type
 response_function = {
-    "normal": normal_response,
+    "normal": normal_chatbot_response,
     "weather": weather_resonse
 }
