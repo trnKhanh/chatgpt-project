@@ -1,3 +1,113 @@
-ul {
-    list-style-type: none;
+* {
+    box-sizing: border-box;
+}
+html, body {
+    height: 100%;
+}
+body {
+    margin: 0;
+    font-size: 24px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* footer */
+footer {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    text-align: center;
+    background-color: black;
+    color: white;
+}
+
+/* header */
+.site-name {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.logo {
+    width: 200px;
+}
+.site-name > .name {
+    font-size: 50px;
+}
+.nav-bar {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    background-color: rgb(41, 40, 40);
+}
+.nav-btn {
+    border-radius: 15px;
+    margin: 5px;
+    padding: 7px;
+    color: white;
+}
+
+/* main */
+main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+.chat-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.message-box {
+    flex: 1;
+    font-size: 24px;
+    overflow: scroll;
+}
+.chat-form {
+    padding: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+.input-box {
+    padding: 10px;
+    color: white;
+    background-color: black;
+    font-size: 24px;
+    flex-grow: 1;
+    border: none;
+}
+.form-select {
+    font-size: 18px;
+}
+.send-btn {
+    font-size: 18px;
+}
+
+.user-message {
+    padding: 5px 25px;
+    background-color: rgb(203, 206, 209);
+}
+.chatbot-message {
+    padding: 5px 25px ;
+}
+
+.mic-btn {
+    text-align: center;
+    height: 50px;
+    width: 50px;
+}
+.mic-btn > img {
+    height: 30px;
+    width: 30px;
+}
+.speak-btn > img {
+    height: 30px;
+    width: 30px;
+}
+.on-btn {
+    background-color: greenyellow;
+}
+.off-btn {
+    background-color: red;
 }
