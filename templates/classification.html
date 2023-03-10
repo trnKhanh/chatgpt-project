@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="classify-box">
+    <form class="classify-form">
+        <textarea class="input-classify-box" autocomplete="off" autofocus placeholder="Enter text here"></textarea>
+        <input type="submit">
+    </form>
+    <div class="answer-box"></div>
+</div>
+<script src="../static/classification.js"></script>
+{% endblock %}

@@ -5,7 +5,7 @@ import json
 import requests
 from mimetypes import guess_extension
 from pydub import AudioSegment
-
+from langdetect import detect
 
 
 max_tokens = 100
@@ -20,14 +20,31 @@ def index():
 
 @app.route("/chatbot")
 def chatbot():
-    return render_template("chatbot.html")
+    return render_template("chatbot.html", botType="normal", messages=normal_chatbot_messages)
+
+@app.route("/weather")
+def weather():
+    return render_template("chatbot.html", botType="weather")
+
+@app.route("/classification")
+def classification():
+    return render_template("classification.html")
+
+@app.route("/classify", methods=["POST"])
+def classify():
+    text = request.json["text"]
+    return json.dumps(classify(text));
 
 @app.route("/response", methods=["POST"])
 def response():
     message = request.json["message"]
     type = request.json["type"]
+    response = response_function[type](message)
     # create response
-    return json.dumps(response_function[type](message))
+    return json.dumps({
+        "message": response,
+        "lang": detect(response),
+    })
 
 @app.route("/whisper", methods=["POST"])
 def whisper():
@@ -43,6 +60,16 @@ def whisper():
     os.remove("audio_file.mp3")
     return json.dumps(transcript["text"])
 
+# classification
+def classify(text):
+    response = openai.Completion.create(
+        model="ada:ft-personal-2023-03-09-03-02-35",
+        prompt=f'{text}\n#\n',
+        max_tokens=1,
+        temperature=0.2,
+    )
+    return response.choices[0].text
+    
 # ask using completion model
 def ask_completion(prompt):
     response = openai.Completion.create(
