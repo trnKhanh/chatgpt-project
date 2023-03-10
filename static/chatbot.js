@@ -7,11 +7,11 @@ mic_on = false;
 speakButton = document.querySelector(".speak-btn");
 speak_on = false;
 let utterance = new SpeechSynthesisUtterance();
-utterance.rate = 1;
+utterance.rate = 0.95;
 utterance.volume = 100;
+let voices;
 speechSynthesis.addEventListener("voiceschanged", () => {
-    let voices = speechSynthesis.getVoices();
-    utterance.voice = voices.find(voice => voice.name === "Google US English");
+    voices = speechSynthesis.getVoices();
 });
 
 if (navigator.mediaDevices.getUserMedia)
@@ -39,7 +39,6 @@ if (navigator.mediaDevices.getUserMedia)
             chunks.push(e.data);
         };
         mediaRecorder.onstop = async function(e){
-            console.log(mediaRecorder.mimeType);
             let blob = new Blob(chunks, {type: mediaRecorder.mimeType});
             chunks = []
             let formData = new FormData();
@@ -48,7 +47,6 @@ if (navigator.mediaDevices.getUserMedia)
                 method: "POST",
                 body: formData,
             }).then((re) => re.json());
-            console.log(response);
             inputBox.value += response;
         };
     }
@@ -71,10 +69,17 @@ speakButton.addEventListener("click",(e) => {
     }
     speak_on = !speak_on;
 })
+var myTimeout;
+function myTimer() {
+    window.speechSynthesis.pause();
+    window.speechSynthesis.resume();
+    myTimeout = setTimeout(myTimer, 10000);
+}
+utterance.onend =  function() { clearTimeout(myTimeout); }
 form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const message = inputBox.value;
-    const chatbotType = formSelect.value;
+    const chatbotType = botType;
 
     messageBox.innerHTML += `<div class="user-message">User: ${message}</div>`;
 
@@ -89,8 +94,14 @@ form.addEventListener("submit", async (e) => {
         }),
     }).then((response) => response.json());
 
-    messageBox.innerHTML += `<div class="chatbot-message">Chatbot: ${response}</div>`;
-    utterance.text = response;
-    if (speak_on) speechSynthesis.speak(utterance);
+    messageBox.innerHTML += `<div class="chatbot-message">Chatbot: ${response["message"]}</div>`;
+    if (speak_on){
+        speechSynthesis.cancel();
+        myTimeout = setTimeout(myTimer, 10000);
+        response["lang"] = response["lang"].toLowerCase();
+        utterance.voice = voices.find(voice => voice.lang.toLowerCase().includes(response["lang"])); 
+        utterance.text = response["message"];
+        speechSynthesis.speak(utterance);
+    }
     inputBox.value = "";
 })
