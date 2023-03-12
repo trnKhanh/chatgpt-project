@@ -3,7 +3,6 @@ import openai
 import os
 import json
 import requests
-from mimetypes import guess_extension
 from pydub import AudioSegment
 from langdetect import detect
 
@@ -64,7 +63,7 @@ def whisper():
 def classify(text):
     response = openai.Completion.create(
         model="ada:ft-personal-2023-03-09-03-02-35",
-        prompt=f'{text}\n#\n',
+        prompt=f'{text.strip()}.\n#\n',
         max_tokens=1,
         temperature=0.2,
     )
@@ -92,20 +91,31 @@ def ask_chat(messages):
 
 # prompt used for completion model
 def normal_prompt(p):
-    return f'You are a chatbot. You should response politely.\nUser: Hello\nChatbot: Hello, sir.\nUser: Who are you?\nChatbot: I am a chatbot\nUser: {p}\nChatbot:'
+    return f"""You are a helpful assistant. You should response politely.
+    ###
+    User: {p}.
+    Assistant: """
 
 def extract_name_prompt(p):
-    return f'Extract name from the sentence.\nSentence: I want to know the weather in India.\nName: India.\nSentence: What is the weather like in Vietnam.\nName: Vietnam.\nSentence: {p}\nName:'
+    return f"""You will response with the location name from user message. Response with the name only. If the user does not ask about the weather, response with unidentify.
+    ###
+    Sentence: {p}.
+    Name: """
 
-def weather_prompt(main, min_temp, max_temp, humidity):
-    return f'Write a  weather description based on given information.\n\nWeather: rain.\nTemperature: 15 to 20 (Celsius Degree).\nHumidity: 80.\nDescription: The weather is rainy with temperature ranging from 15 to 20 Celsius Degree. The humidity is around 80%. Remember to bring umbrella when going out.\n\nWeather: sunny.\nTemperature: 30 to 40 (Celsius Degree).\nHumidity: 50.\nDescription:  The weather is sunny with temperature ranging from 30 to 40 Celsius Degree. The humidity is around 50%, making it a very hot day day. Remember to use sun cream before going out.\n\nWeather: {main}.\nTemperature: {min_temp} to {max_temp}(Celsius Degree).\nHumidity: {humidity}.\nDescription: '
+def weather_description_prompt(main, min_temp, max_temp, humidity):
+    return f"""Write a weather description based on given information.
+    ###
+    Weather: rain. Temperature: 15 to 20 (Celsius Degree). Humidity: 80.
+    Description: The weather is rainy with temperature ranging from 15 to 20 Celsius Degree. The humidity is around 80%. Remember to bring umbrella when going out.
+    Weather: {main}. Temperature: {min_temp} to {max_temp} (Celsius Degree). Humidity: {humidity}.
+    Description: """
 
 # messages used for chat model
 normal_chatbot_messages = [
-    {"role": "system", "content": "You are a helpful assistant."},
+    {"role": "system", "content": "You are a helpful assistant. You should response politely."},
 ]
 extract_name_messages = [
-    {"role": "system", "content": "You will response with the location name from user message. Response with the name only."},
+    {"role": "system", "content": "You will response with the location name from user message. Response with the name only. If the user does not ask about the weather, response with unidentify."},
     {"role": "user", "content":""},
 ]
 weather_description_messages = [
