@@ -102,12 +102,12 @@ def extract_name_prompt(p):
     Sentence: {p}.
     Name: """
 
-def weather_description_prompt(main, min_temp, max_temp, humidity):
+def weather_description_prompt(main, min_temp, max_temp, humidity, lang):
     return f"""Write a weather description based on given information.
     ###
-    Weather: rain. Temperature: 15 to 20 (Celsius Degree). Humidity: 80.
+    Weather: rain. Temperature: 15 to 20 (Celsius Degree). Humidity: 80. Language: en.
     Description: The weather is rainy with temperature ranging from 15 to 20 Celsius Degree. The humidity is around 80%. Remember to bring umbrella when going out.
-    Weather: {main}. Temperature: {min_temp} to {max_temp} (Celsius Degree). Humidity: {humidity}.
+    Weather: {main}. Temperature: {min_temp} to {max_temp} (Celsius Degree). Humidity: {humidity}. Language: {lang}.
     Description: """
 
 # messages used for chat model
@@ -118,12 +118,15 @@ extract_name_messages = [
     {"role": "system", "content": "You will response with the location name from user message. Response with the name only. If the user does not ask about the weather, response with unidentify."},
     {"role": "user", "content":""},
 ]
+# {"role": "user", "content": sentence}
+
 weather_description_messages = [
     {"role": "system", "content": "Write a weather description based on given information."},
-    {"role": "user", "content": "Weather: rain. Temperature: 15 to 20 (Celsius Degree). Humidity: 80."},
+    {"role": "user", "content": "Weather: rain. Temperature: 15 to 20 (Celsius Degree). Humidity: 80. Language: en"},
     {"role": "assistant", "content": "The weather is rainy with temperature ranging from 15 to 20 Celsius Degree. The humidity is around 80%. Remember to bring umbrella when going out."},
     {"role": "user", "content":""},
 ]
+# {"role": "user", "content": f'Weather: {main}. Temperature: {temp_min} to {temp_max} (Celsius Degree). Humidity: {humidity}. Language: {lang}'}
 
 # response functions
 # normal chatbot
@@ -143,8 +146,8 @@ def extract_name(message):
     name = ask_chat(extract_name_messages)
     return name
 
-def get_weather_description(main, temp_min, temp_max, humidity):
-    weather_description_messages[-1]["content"] = f'Weather: {main}. Temperature: {temp_min} to {temp_max} (Celsius Degree). Humidity: {humidity}.'
+def get_weather_description(main, temp_min, temp_max, humidity, lang):
+    weather_description_messages[-1]["content"] = f'Weather: {main}. Temperature: {temp_min} to {temp_max} (Celsius Degree). Humidity: {humidity}. Language: {lang}'
     weather_description = ask_chat(weather_description_messages)
     return weather_description
 
@@ -160,10 +163,11 @@ def weather_resonse(message):
         temp_min = weather["main"]["temp_min"]
         temp_max = weather["main"]["temp_max"]
         humidity = weather["main"]["humidity"]
+        lang = detect(message)
     except:
         return "I do not understand what you've said."
 
-    return get_weather_description(main, temp_min, temp_max, humidity)
+    return get_weather_description(main, temp_min, temp_max, humidity, lang)
 
 # dictionary for response type
 response_function = {
