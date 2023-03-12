@@ -82,6 +82,7 @@ form.addEventListener("submit", async (e) => {
     const chatbotType = botType;
 
     messageBox.innerHTML += `<div class="user-message">User: ${message}</div>`;
+    messageBox.innerHTML += `<div class="chatbot-message">Chatbot: Loading...</div>`;
 
     const response = await fetch(`/response`, {
         method: "POST",
@@ -94,7 +95,8 @@ form.addEventListener("submit", async (e) => {
         }),
     }).then((response) => response.json());
 
-    messageBox.innerHTML += `<div class="chatbot-message">Chatbot: ${response["message"]}</div>`;
+    messageBox.lastChild.innerHTML = `Chatbot: ${response["message"]}`;
+
     if (speak_on){
         speechSynthesis.cancel();
         myTimeout = setTimeout(myTimer, 10000);
