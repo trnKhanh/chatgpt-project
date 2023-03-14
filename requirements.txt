@@ -1,0 +1,7 @@
+flask
+openai
+os
+json
+requests
+pydub
+langdetect
